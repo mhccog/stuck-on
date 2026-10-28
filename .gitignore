@@ -1,0 +1,8 @@
+cache/
+site
+*.log
+node_modules/
+.env
+.env.*
+*.tmp
+__pycache__/

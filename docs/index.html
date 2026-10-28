@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Everything we're stuck on</title>
+<meta name="description" content="A calm sky of humanity's open problems, gathered from where they are written down. The ones nobody is visibly working on glow.">
+<meta name="theme-color" content="#04060b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23ffd9a0' opacity='.25'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%23ffd9a0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="sky" aria-label="A sky of open problems. Each point of light is one open problem."></canvas>
+<div class="vignette"></div>
+
+<header class="brand">
+  <h1>Everything we're stuck on</h1>
+  <p>Humanity's open problems, gathered from where they're written down. The ones nobody is visibly working on glow.</p>
+  <div class="counts" id="counts">Gathering the sky…</div>
+</header>
+
+<section class="find">
+  <div class="searchwrap">
+    <input id="q" type="search" maxlength="120" placeholder="Search the open problems" aria-label="Search open problems" autocomplete="off">
+    <ul id="results" class="results" role="listbox" hidden></ul>
+  </div>
+  <button id="drift" class="drift" type="button" aria-pressed="false" title="Wander slowly between neglected problems">
+    <span class="drift-dot"></span><span id="driftLabel">Drift</span>
+  </button>
+</section>
+
+<nav class="fields" id="fields" aria-label="Filter by field"></nav>
+
+<aside class="quiet glass" id="quiet">
+  <h2>Quietest corners</h2>
+  <p class="hint">Named problems with no papers, repositories or Hacker News threads mentioning them in two years.</p>
+  <ol id="quietList"></ol>
+</aside>
+
+<aside class="panel glass" id="panel" hidden aria-live="polite">
+  <button class="close" id="close" aria-label="Close">×</button>
+  <div id="panelBody"></div>
+</aside>
+
+<section class="caption" id="caption" aria-live="polite">
+  <p class="caption-topic" id="capTopic"></p>
+  <p class="caption-main" id="capMain"></p>
+  <p class="caption-sub" id="capSub"></p>
+</section>
+
+<footer class="foot">
+  <div class="legend">
+    <span><i class="lg glow"></i>Glowing: little visible work</span>
+    <span><i class="lg calm"></i>Small and steady: busy</span>
+    <span><i class="lg ring"></i>Ring: not measured yet</span>
+  </div>
+  <div class="health" id="health"></div>
+  <button class="about-btn" id="aboutBtn" type="button">How this works</button>
+</footer>
+
+<div class="tip" id="tip" hidden></div>
+
+<dialog id="about" class="about">
+  <form method="dialog"><button class="close" aria-label="Close">×</button></form>
+  <h2>How this works</h2>
+  <p>Every point of light is one open problem that someone has written down in public. Nothing here is invented: each one links back to the page it came from. Problems are grouped into constellations by field.</p>
+  <h3>How bright</h3>
+  <p>For each named problem we count public signs of work over the last 24 months: papers (arXiv for maths, computing and physics; Europe PMC for life, health, chemistry and earth sciences; OpenAlex for the rest), GitHub repositories, and Hacker News stories or comments that mention it by name. Brightness is the rank within its own source, so a glow means "quieter than most problems from the same list", not "nobody on Earth works on this".</p>
+  <ul>
+    <li><b>Gap Map</b> gaps are ranked by how many capabilities and resources Gap Map itself lists against them.</li>
+    <li><b>Papers</b> ("stated in a recent paper") are ranked by how often that paper has been cited so far.</li>
+    <li><b>Erdős problems</b> without a common name are ranked only by the community database: Lean formalisation, OEIS links and how recently their status was touched.</li>
+    <li>Problems without a short searchable name show as rings: not yet measured.</li>
+  </ul>
+  <h3>Sources and licences</h3>
+  <div id="srcList"></div>
+  <h3>Honest limits</h3>
+  <ul>
+    <li>"Open" is only as good as the list it came from. Lists lag the literature, and some problems here may already be solved.</li>
+    <li>Name matching is literal. A problem known by several names may look quieter than it is; a common phrase may look busier.</li>
+    <li>English-language sources only, for now.</li>
+    <li>"Who's working on it" shows public papers, repositories and threads, never contact details. There is no messaging here.</li>
+    <li>Skipped: the UIA Encyclopedia of World Problems. Its open API sits behind a bot check and UIA's data-extraction terms forbid redistribution, so we left it out rather than scrape it.</li>
+  </ul>
+  <p class="small">Data is rebuilt by a scheduled GitHub Actions workflow. Code: <a href="https://github.com/mhccog/stuck-on" target="_blank" rel="noopener">github.com/mhccog/stuck-on</a>. A sibling of the <i>You're not the only one</i> prototype.</p>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

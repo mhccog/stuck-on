@@ -1,0 +1,43 @@
+name: Rebuild the sky
+
+on:
+  schedule:
+    - cron: "23 4 * * *"   # daily, 04:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rebuild
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install beautifulsoup4==4.12.3 pyyaml==6.0.2
+      - name: Restore raw source cache
+        uses: actions/cache@v4
+        with:
+          path: cache/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+      - name: Gather problems and refresh activity signals
+        env:
+          # The workflow's own short-lived token, only used for GitHub's search API.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -u scripts/build.py --minutes 55 --openalex-credits 300
+      - name: Commit updated data
+        run: |
+          git config user.name "stuck-on bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/problems.json data-cache/activity.json data-cache/problems-raw.json
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Rebuild the sky ($(date -u +%Y-%m-%d))"
+          git push
