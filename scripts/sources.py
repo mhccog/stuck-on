@@ -267,6 +267,9 @@ OPG_CATS = ["algebra", "analysis", "combinatorics", "geometry", "graph_theory", 
             "number_theory_0", "pdes", "probability", "theoretical_computer_science", "topology"]
 
 
+OPG_SPAM = re.compile(r"cheat|generator|v-bucks|\bapk\b|\bhack|no survey|verification|free!|\b20[2-3]\d\b|coins|gems|diamonds|unlimited|dragon ball|guide|^hello$", re.I)
+
+
 def opg(delay=10):
     out = []
     base = "https://www.openproblemgarden.org"
@@ -291,6 +294,10 @@ def opg(delay=10):
                 authors = [clean(x.get_text()) for x in tr.select("td.view-field-node-data-field-last-names-field-last-names-value a")]
                 stars = clean((tr.select_one("td.view-field-node-data-field-stars1-field-stars1-value") or BeautifulSoup("", "html.parser")).get_text()).count("✭")
                 title = clean(a.get_text())
+                authors = [x for x in authors if x]
+                # the wiki has spam pages (game "cheat generators") filed under Algebra: real problems name who posed them
+                if not authors or OPG_SPAM.search(title):
+                    continue
                 fam = "Computing & information" if cat == "theoretical_computer_science" else "Mathematics"
                 out.append({
                     "id": pid("opg", a["href"]),

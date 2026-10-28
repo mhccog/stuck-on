@@ -13,7 +13,7 @@ Pillar 4 of "The foundation: five ways to connect the world": *which problems ha
 | Source | What we take | Licence / terms |
 | --- | --- | --- |
 | Wikipedia "List of unsolved problems in …" (13 lists) | Each list item under an unsolved section, with its heading and link | CC BY-SA 4.0; text shown with a link to the exact revision |
-| Open Problem Garden | Unsolved-problem tables per category: title, who posed it, importance stars. Crawled at its robots.txt crawl delay (10 s) | GNU FDL |
+| Open Problem Garden | Unsolved-problem tables per category: title, who posed it, importance stars. Crawled at its robots.txt crawl delay (10 s). Spam pages (game "cheat generators" filed under Algebra) and rows with no named poser are dropped | GNU FDL |
 | Erdős problems database (teorth/erdosproblems) | Problems whose status is open (or falsifiable / verifiable / decidable), tags, prize, Lean and OEIS links | Apache-2.0 |
 | Convergent Research Gap Map | R&D gaps, their foundational capabilities and the resources listed against them | MIT |
 | OpenAlex | Sentences in recent (last 300 days) abstracts saying something "remains an open question", "remains poorly understood"… quoted and linked to the paper | CC0 metadata |
