@@ -37,7 +37,7 @@ jobs:
         run: |
           git config user.name "stuck-on bot"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data/problems.json data-cache/activity.json data-cache/problems-raw.json
+          git add docs/data/problems.json docs/data/atlas.json data-cache/activity.json data-cache/problems-raw.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Rebuild the sky ($(date -u +%Y-%m-%d))"
           git push

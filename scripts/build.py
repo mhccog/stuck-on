@@ -76,6 +76,10 @@ for p in problems:
     elif p["source"] == "openalex":
         p["activity"] = lg(p["paper"]["citedBy"]) * 1.2
         p["measured"] = "Citations of the paper that stated it (OpenAlex)"
+    elif p.get("query") and not (sig.get("papers") and sig.get("repos") and sig.get("hn")):
+        # partly measured: don't rank it against fully measured problems yet
+        p["activity"] = None
+        p["measured"] = "Still being measured (" + ", ".join(k for k in ("papers", "repos", "hn") if k in sig) + " so far)" if sig else None
     elif sig.get("papers") or sig.get("repos") or sig.get("hn"):
         p["activity"] = lg(sig.get("papers", {}).get("n")) * 1.0 + lg(sig.get("repos", {}).get("n")) * 0.6 + lg(sig.get("hn", {}).get("n")) * 0.5
         p["measured"] = "Mentions in the last 24 months: " + ", ".join(
@@ -96,6 +100,7 @@ for p in problems:
 
 # neglect = 1 - percentile of activity within each source (sources measure differently)
 from collections import defaultdict
+import bisect
 by = defaultdict(list)
 for p in problems:
     if p["activity"] is not None:
@@ -107,10 +112,11 @@ for src, ps in by.items():
         # ties share the lowest rank so all-zero problems are equally neglected
         p["neglect"] = None
     vals = [p["activity"] for p in ps]
-    import bisect
     for p in ps:
-        rank = bisect.bisect_left(vals, p["activity"])
-        p["neglect"] = round(1 - rank / max(1, n - 1), 3) if n > 1 else 0.5
+        # share of problems from the same source that show MORE activity than this one
+        lo, hi = bisect.bisect_left(vals, p["activity"]), bisect.bisect_right(vals, p["activity"])
+        p["neglect"] = round(1 - (lo + hi) / (2 * n), 3) if n > 1 else 0.5   # mid-rank: ties share a place
+        p["busier"] = round((n - hi) / n, 3)                                   # share with strictly more activity
 for p in problems:
     p.setdefault("neglect", None)
     if p.get("activity") is not None:
@@ -129,3 +135,45 @@ os.makedirs(OUT, exist_ok=True)
 json.dump({"meta": meta, "families": sources.FAMILIES, "problems": problems}, open(os.path.join(OUT, "problems.json"), "w"),
           ensure_ascii=False, separators=(",", ":"))
 print(json.dumps(meta, indent=1))
+
+# ---------------------------------------------------------------- standalone export for other sites
+# docs/data/atlas.json: a slim, stable, renderer-independent view of the same data. See docs/data/SCHEMA.md.
+def iso(t):
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)) if t else None
+
+export = []
+for p in problems:
+    sig = p.get("signals") or {}
+    act = {}
+    for k in ("papers", "repos", "hn"):
+        if k in sig:
+            act[k] = {"count": sig[k].get("n", 0), "checkedAt": iso(sig[k].get("t"))}
+            if sig[k].get("via"):
+                act[k]["via"] = sig[k]["via"]
+    paper = p.get("paper")
+    export.append({
+        "id": p["id"],
+        "title": p["title"],
+        "statement": p.get("statement") or None,
+        "field": p["family"],
+        "subfield": p.get("subfield") or None,
+        "source": p["source"],
+        "sourceName": p["sourceName"],
+        "sourceUrl": p["sourceUrl"],
+        "articleUrl": p.get("articleUrl"),
+        "statedIn": {"paperTitle": paper["title"], "date": paper["date"], "venue": paper["venue"],
+                     "countries": paper["countries"], "citedBy": paper["citedBy"]} if paper else None,
+        "location": None,  # no source gives coordinates; statedIn.countries (ISO 3166-1 alpha-2) where known
+        "confidence": p.get("confidence"),
+        "searchedAs": p.get("query"),
+        "activity": act or None,
+        "activityScore": p.get("activity"),
+        "neglect": p.get("neglect"),
+        "busierShare": p.get("busier"),
+        "measuredBy": p.get("measured"),
+        "url": "https://mhccog.github.io/stuck-on/#p=" + p["id"],
+    })
+json.dump({"schema": "stuck-on/atlas@1", "generated": meta["generated"], "windowDays": meta["windowDays"],
+           "families": sources.FAMILIES, "sources": status, "count": len(export), "problems": export},
+          open(os.path.join(OUT, "atlas.json"), "w"), ensure_ascii=False, separators=(",", ":"))
+print("wrote atlas.json", len(export))

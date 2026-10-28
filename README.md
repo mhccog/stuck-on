@@ -35,6 +35,14 @@ citations, and Erdős problems without a common name use only the community data
 (formalisation, OEIS links, recency of status updates). Problems without a short name are drawn
 as rings: not measured.
 
+## For other sites (merging)
+
+* **Data:** `docs/data/atlas.json` → https://mhccog.github.io/stuck-on/data/atlas.json, schema `stuck-on/atlas@1`,
+  documented in [`docs/data/SCHEMA.md`](docs/data/SCHEMA.md). Renderer-independent; ids and fields are stable.
+* **Renderer:** `docs/js/sky.js` exposes `StuckSky.create(canvas, problems, opts)`; the page UI lives in
+  `docs/app.js` and only talks to the renderer through that object.
+* **Pipeline:** `scripts/sources.py` (fetchers), `scripts/activity.py` (signals), `scripts/build.py` (scoring + export).
+
 ## Rebuilding
 
 ```

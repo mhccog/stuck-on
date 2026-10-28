@@ -38,6 +38,8 @@ def pid(*parts):
 def clean(t):
     t = re.sub(r"\[\s*(\d+|[a-z]|citation needed|note \d+)\s*\]", "", t)
     t = re.sub(r"\s+", " ", t).strip()
+    t = re.sub(r"\(\s+", "(", t)
+    t = re.sub(r"\s+([),.;:?])", r"\1", t)
     return t
 
 
